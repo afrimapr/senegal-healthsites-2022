@@ -1,0 +1,147 @@
+---
+title: "Comparing health facility location data for Senegal"
+#output: html_document
+author: "Andy South @afrimapr"
+date: "`r Sys.Date()`"
+output: pdf_document
+urlcolor: blue
+always_allow_html: true
+---
+
+DRAFT
+
+[Code for this document](https://github.com/afrimapr/senegal-healthsites-2022/blob/master/senegal-healthsites-compare.Rmd)   
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+
+library(knitr)
+library(tidyverse)
+
+```
+
+
+```{r read-data, include=FALSE}
+
+# get local file data, can't share yet
+folder <- "C:\\Users\\andy.south\\Google Drive\\afrimapr-gdrive\\Proposals\\2022-01-senegal-covidaction\\data\\"
+filename <- "2022-02-senegal-structures.csv"
+filename <- paste0(folder,filename)
+
+filenamecous_sl <- "2022-02-20-cous10-stlouis-anon.csv"
+filenamecous_sl <- paste0(folder,filenamecous_sl)
+
+filename_lamine <- "2022-02-28-lamine-kobo.csv"
+filename_lamine <- paste0(folder,filename_lamine)
+  
+#dprss file just contains names of facilities - with names of admin regions in too
+filename_dprss <- "2022-02-dprss-names.csv"
+filename_dprss <- paste0(folder,filename_dprss)
+
+##reading in data
+
+dfcous_sl <- read_csv(filenamecous_sl)
+#names(dfcous_sl) #127!
+
+#the Longitude of #9 needed to be -ve to stop it being in Chad
+#I corrected in the csv
+#dfcous_sl$Longitude[9]
+#[1] -16.1452
+
+#no header in the dprss file
+dfdprss <- read_csv(filename_dprss, col_names = "dprss_names")
+
+# convert cous column names to be more manageable
+names(dfcous_sl) <- names(dfcous_sl) %>% 
+  #fix accents
+  #str_conv(encoding = "ISO-8859-1") %>% 
+  #remove accents
+  stringi::stri_trans_general("Latin-ASCII") %>%
+  #remove some long text
+  str_replace_all("Quel est le nombre de ","") %>%
+  str_replace_all("Quel est le nombre d'","") %>%
+  str_replace_all("Quel est le nombre d ","") %>%
+  str_replace_all("Quel est le ","") %>% 
+  str_replace_all(" de la structure de sante","") %>% 
+  str_replace_all("\\?", "") %>% 
+  str_replace_all(" \\?", "") %>%  
+  #lower case
+  str_to_lower() %>%
+  #replace spaces with _
+  str_replace_all("\\s", "_")
+
+
+```
+
+Initial comparison of data from COUS & DPRSS.
+
+The aim is to see if we can develop code to help with the process of improving health facility location data by comparing and combining data from different sources.
+
+COUS provided an Excel file with two sheets.
+
+**COUS** Sheet2 for Saint Louis has **9 rows** and **130 columns** including coordinates and attributes such as the numbers of beds and staff.
+
+DPRSS provided the names of facilities and regions for the whole country in a file with **374 rows and 1 column**.
+
+#### COUS data
+
+Names of facilities.
+
+```{r cous-names}
+
+dfcousnames <- tibble(cous_names=dfcous_sl$nom)
+
+knitr::kable(dfcousnames)
+
+
+# EPS1 de Richard Toll
+# 3 Centre  de Sante  de Dagana
+# Centre de Sante de Saint Louis
+# Centre de Sante Amadou Malick Gaye
+# Centre de Sante de  Pete
+# Centre de santé de Richard Toll
+# HOPITAL REGIONAL DE SAINT LOUIS
+# CHR NDioum
+# Centre de santé de Ross Bethio
+
+#lets add dprss names in half by hand, text searched in RStudio
+
+dfcousnames$dprss_names <- c("EPS 1 Richard Toll",
+                             "CS Dagana",
+                             "CS Saint - Louis",
+                             "?",
+                             "[-] CS Pete",
+                             "CS Richard Toll",
+                             "?",
+                             "?Antenne de Ndioum",
+                             "[-] CS Ross Bethio")
+  
+
+
+```
+#### DPRSS data
+
+Lets look at the first 9 rows of the DPRSS data.
+
+```{r dprss-names}
+
+knitr::kable(dfdprss[1:9,])
+
+```
+We can see that sometimes rows indicate regions, e.g. `[-] RM Saint-Louis` and `[-] Dagana`. Also sometimes a row with a `[-]` indicates a facility that has control over others e.g. `[-] PS Bokhol`. This makes it difficult to analyse the data automatically because it is difficult to detect whether a row refers to a facility or not. It may be that if a row has a [-] and does not have PS, CS or Case then it is not a facility.
+
+We can compare the COUS & DPRSS tables above to check whether the facility names in the COUS data appear exactly the same as in the DPRSS data. We would need to be able to write code to find matching names to be able to write a reproducible pipeline for comparing data.
+
+An initial search by eye shows the mismatches between naming in the two datasets.
+
+```{r cous-dprss-names}
+
+knitr::kable(dfcousnames)
+
+```
+
+
+
+
+
+
