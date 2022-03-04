@@ -13,10 +13,12 @@ DRAFT
 [Code for this document](https://github.com/afrimapr/senegal-healthsites-2022/blob/master/senegal-healthsites-compare.Rmd)   
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE)
 
 library(knitr)
 library(tidyverse)
+library(sf)
+library(tmap)
 
 ```
 
@@ -40,6 +42,10 @@ filename_dprss <- paste0(folder,filename_dprss)
 
 ##reading in data
 
+
+#no header in the dprss file
+dfdprss <- read_csv(filename_dprss, col_names = "dprss_names")
+
 dfcous_sl <- read_csv(filenamecous_sl)
 #names(dfcous_sl) #127!
 
@@ -48,8 +54,12 @@ dfcous_sl <- read_csv(filenamecous_sl)
 #dfcous_sl$Longitude[9]
 #[1] -16.1452
 
-#no header in the dprss file
-dfdprss <- read_csv(filename_dprss, col_names = "dprss_names")
+dfcous_sl <- dfcous_sl %>% 
+  rename(nom = `Quel est le nom de la structure de sante?`) %>% 
+  rename(categorie = `Quelle est la Categorie de la Structure de Sante?`)   
+  
+  #some of conversions below can be done this way too
+  #rename_with( str_to_lower() )
 
 # convert cous column names to be more manageable
 names(dfcous_sl) <- names(dfcous_sl) %>% 
@@ -63,15 +73,18 @@ names(dfcous_sl) <- names(dfcous_sl) %>%
   str_replace_all("Quel est le nombre d ","") %>%
   str_replace_all("Quel est le ","") %>% 
   str_replace_all(" de la structure de sante","") %>% 
+  str_replace_all("Quelle est la ","") %>% 
   str_replace_all("\\?", "") %>% 
   str_replace_all(" \\?", "") %>%  
   #lower case
   str_to_lower() %>%
+  str_squish() %>% #remove whitespace from either side & repeats in middle
   #replace spaces with _
   str_replace_all("\\s", "_")
 
 
 ```
+
 
 Initial comparison of data from COUS & DPRSS.
 
@@ -140,8 +153,109 @@ knitr::kable(dfcousnames)
 
 ```
 
+```{r make-geo, include=FALSE}
+
+sfcous_sl <- st_as_sf(dfcous_sl, 
+                      coords=c("longitude", "latitude"), 
+                      crs=4326)
+
+```
+
+\pagebreak
+
+## Categories of COUS health facilities Saint Louis
+
+```{r map-cous-sl, eval=TRUE, fig.height=4.5, fig.width=7.5, fig.show='hold'}
+
+library(tmap)
+library(afriadmin)
+
+sfsen_adm0 <- afriadmin('senegal',level=0, plot=FALSE)
+sfsen_adm1 <- afriadmin('senegal',level=1, plot=FALSE)
+
+#mapping 3 category types
+tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+    tm_borders("grey", lwd = .5) +
+    tm_shape(sfsen_adm0) +
+    tm_borders("black", lwd = .5) +
+  
+  tm_shape(sfcous_sl) +
+    #tm_dots(shape=3, size = 0.15, col='red', border.lwd = 0.2) +
+  
+    tm_symbols(shape="categorie", col='red', shapes=c(3,1,0)) +
+  
+    tm_layout(main.title='COUS health facilities Saint Louis 2022', main.title.size=1,
+              legend.bg.color=TRUE,
+              title="map by @afrimapr", title.color="darkgrey", title.size=0.8, title.position=c("RIGHT","BOTTOM")) #main.title goes above map
+   
+#add NA points, have to do separately because shapeNA doesn't work for size    
+# tm_shape(sfsen_sur[is.na(sfsen_sur$beds),]) +
+#   tm_dots(shape=3, size = 0.15, col='grey', border.lwd = 0.2) +    
+# tm_shape(sfsen_sur) +
+#     tm_symbols(col = "building", alpha=0.8, size = "beds", size.max=420, 
+#                scale=3, sizes.legend=c(10,100,400), title.col="") +
+# tm_add_legend(type="symbol", shape=3, labels = "no bed data", size = 0.5, border.lwd = 0.5, col = "grey") +
+#     tm_scale_bar(breaks=c(0,50,100), position=c("LEFT", "BOTTOM")) +
 
 
+```
 
 
+## Numbers of beds (lits) in different wards from COUS data
+
+```{r map-cous-lits, eval=TRUE, fig.height=2.5, fig.show='hold'}
+
+lits_columns <- names(sfcous_sl)[str_starts(names(sfcous_sl),"lits")]
+
+for(column_to_map in lits_columns)
+{
+
+ #cat(column_to_map)
+  
+ # tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+ #    tm_borders("grey", lwd = .5) +
+ #    tm_shape(sfsen_adm0) +
+ #    tm_borders("black", lwd = .5) +
+ #  
+ #  tm_shape(sfcous_sl) +
+ #    #tm_dots(shape=3, size = 0.15, col='red', border.lwd = 0.2) +
+ #    tm_text(column_to_map, col='red') +
+ #    #tm_symbols(shape="categorie", col='red', shapes=c(3,1,0)) +
+ #  
+ #    tm_layout(main.title=column_to_map, main.title.size=1,
+ #              legend.bg.color=TRUE,
+ #              title="map by @afrimapr", title.color="darkgrey", title.size=0.8, title.position=c("RIGHT","BOTTOM")) #main.title goes above map
+ 
+# can I do in ggplot to allow repel of labels ? 
+library(ggplot2)
+library(ggrepel)
+
+gg <- ggplot(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+    geom_sf() +
+    theme_void() + 
+    geom_sf(data=sfcous_sl) +
+    geom_text_repel(data=sfcous_sl, aes(label=.data[[column_to_map]], geometry=geometry),
+                     stat="sf_coordinates",
+                     #point.padding = NA, #allows points to overlap centroid
+                     colour='red', size=5
+                    ) +
+    labs(title = paste("COUS", column_to_map))
+    
+  
+# gg <- ggplot(africountries) +
+#     geom_sf(aes(fill = pop_est)) +
+#     scale_fill_viridis_c() +
+#     theme_void() +
+#     geom_text_repel(aes(label=name_long, geometry=geometry),
+#                     stat="sf_coordinates",
+#                     point.padding = NA, #allows points to overlap centroid
+#                     colour='darkgrey', size=3
+#                    ) +
+#     labs(title = "Population by country 2000", fill = "Population Estimate")
+
+plot(gg)
+
+}
+
+```
 
