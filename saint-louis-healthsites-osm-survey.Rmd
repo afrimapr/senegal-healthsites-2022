@@ -1,0 +1,192 @@
+---
+title: "OSM survey of Saint Louis Health Facilities 2022"
+#output: html_document
+author: "Andy South @afrimapr"
+date: "`r Sys.Date()`"
+output: pdf_document
+urlcolor: blue
+always_allow_html: true
+---
+
+DRAFT
+
+[Code for this document](https://github.com/afrimapr/senegal-healthsites-2022/blob/master/saint-louis-healthsites-osm-survey.Rmd)   
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE)
+
+library(knitr)
+library(tidyverse)
+library(sf)
+library(tmap)
+
+```
+
+
+```{r read-data, include=FALSE}
+
+# get local file data, can't share yet
+folder <- "C:\\Users\\andy.south\\Google Drive\\afrimapr-gdrive\\Proposals\\2022-01-senegal-covidaction\\data\\"
+
+filename_lamine <- "2022-02-28-lamine-kobo.csv"
+filename_lamine <- paste0(folder,filename_lamine)
+
+
+#dfosm <- read_csv(filename_lamine)
+#394 rows 289 columns
+#sorts accents
+dfosm <- read_csv(filename_lamine, locale=locale(encoding = "ISO-8859-1"))
+
+#convert column names to lowercase & remove any accents and spaces
+names(dfosm) <- names(dfosm) %>% 
+  #fix accents
+  str_conv(encoding = "ISO-8859-1") %>% 
+  #remove accents
+  stringi::stri_trans_general("Latin-ASCII") %>%
+  #lower case
+  str_to_lower() %>% 
+  #replace spaces with _
+  str_replace_all("\\s", "_") %>% 
+  #remove _facility_location_ before coords
+  str_replace_all("_facility_location_", "") %>% 
+  str_replace_all("\\?", "") %>%   
+  str_replace_all("what_is_the_number_of_", "") 
+
+#dfosm$in_which_health_zone_is_the_facility_located
+#[1] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA 
+
+dfosm2 <- dfosm %>% select(name_of_facility, 
+                           city, 
+                           operator_type, 
+                           longitude, 
+                           latitude, 
+                           operational_status,
+                           facility_category,
+                           number_of_beds,
+                           number_of_doctors,
+                           number_of_nurses)
+
+table(dfosm2$facility_category)
+# Clinic  Dentist  Doctors Hospital Pharmacy 
+# 15        2      294       22       61 
+
+
+```
+
+```{r make-geo, include=FALSE}
+
+sfosm <- st_as_sf(dfosm2, 
+                  coords=c("longitude", "latitude"), 
+                  crs=4326)
+
+
+```
+
+
+## Categories of OSM health facilities Saint Louis
+
+```{r map-osm-sl, eval=TRUE, fig.height=4.5, fig.width=7.5, fig.show='hold'}
+
+library(tmap)
+library(afriadmin)
+
+sfsen_adm0 <- afriadmin('senegal',level=0, plot=FALSE)
+sfsen_adm1 <- afriadmin('senegal',level=1, plot=FALSE)
+
+#map category types
+tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+    tm_borders("grey", lwd = .5) +
+    tm_shape(sfsen_adm0) +
+    tm_borders("black", lwd = .5) +
+  
+  tm_shape(sfosm) +
+    #tm_dots(shape=3, size = 0.15, col='red', border.lwd = 0.2) +
+  
+  # Clinic  Dentist  Doctors Hospital Pharmacy 
+  # 15        2      294       22       61
+  #0square,1circle,2triangle,3+,4x
+  
+    tm_symbols(shape="facility_category", col='red', shapes=c(0,1,3,2,4), size=0.1) +
+  
+    tm_layout(main.title='OSM health facilities Saint Louis 2022', main.title.size=1,
+              legend.bg.color=TRUE, legend.position=c("center","BOTTOM"),
+              title="map by @afrimapr", title.color="darkgrey", title.size=0.8, title.position=c("RIGHT","BOTTOM")) #main.title goes above map
+   
+#map operator_type
+tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+    tm_borders("grey", lwd = .5) +
+    tm_shape(sfsen_adm0) +
+    tm_borders("black", lwd = .5) +
+  
+  tm_shape(sfosm) +
+    #tm_dots(shape=3, size = 0.15, col='red', border.lwd = 0.2) +
+  
+  # table(dfosm$operator_type)
+  #Community Government    Private     Public  Religious 
+  #      29          2         74        261          1 
+  #0square,1circle,2triangle,3+,4x
+  
+    tm_symbols(shape="operator_type", col='red', shapes=c(0,1,2,3,4), size=0.1) +
+  
+    tm_layout(main.title='OSM health facilities Saint Louis 2022', main.title.size=1,
+              legend.bg.color=TRUE, legend.position=c("center","BOTTOM"),
+              title="map by @afrimapr", title.color="darkgrey", title.size=0.8, title.position=c("RIGHT","BOTTOM")) #main.title goes above map
+
+#add NA points, have to do separately because shapeNA doesn't work for size    
+# tm_shape(sfsen_sur[is.na(sfsen_sur$beds),]) +
+#   tm_dots(shape=3, size = 0.15, col='grey', border.lwd = 0.2) +    
+# tm_shape(sfsen_sur) +
+#     tm_symbols(col = "building", alpha=0.8, size = "beds", size.max=420, 
+#                scale=3, sizes.legend=c(10,100,400), title.col="") +
+# tm_add_legend(type="symbol", shape=3, labels = "no bed data", size = 0.5, border.lwd = 0.5, col = "grey") +
+#     tm_scale_bar(breaks=c(0,50,100), position=c("LEFT", "BOTTOM")) +
+
+
+```
+
+
+## Numbers from OSM data
+
+```{r map-osm-attributes, eval=TRUE, fig.height=4, fig.show='hold'}
+
+columns <- c("number_of_beds","number_of_doctors","number_of_nurses")
+
+for(column_to_map in columns)
+{
+
+ #cat(column_to_map)
+ 
+# can I do in ggplot to allow repel of labels ? 
+library(ggplot2)
+library(ggrepel)
+
+gg <- ggplot(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+    geom_sf() +
+    theme_void() + 
+    geom_sf(data=sfosm, size=1) +
+    geom_text_repel(data=sfosm, aes(label=.data[[column_to_map]], geometry=geometry),
+                     stat="sf_coordinates",
+                     segment.size = 0.2, segment.alpha = 0.7,
+                     #point.padding = NA, #allows points to overlap centroid
+                     colour='red', size=2
+                    ) +
+    labs(title = paste("OSM", column_to_map))
+    
+  
+# gg <- ggplot(africountries) +
+#     geom_sf(aes(fill = pop_est)) +
+#     scale_fill_viridis_c() +
+#     theme_void() +
+#     geom_text_repel(aes(label=name_long, geometry=geometry),
+#                     stat="sf_coordinates",
+#                     point.padding = NA, #allows points to overlap centroid
+#                     colour='darkgrey', size=3
+#                    ) +
+#     labs(title = "Population by country 2000", fill = "Population Estimate")
+
+plot(gg)
+
+}
+
+```
+
