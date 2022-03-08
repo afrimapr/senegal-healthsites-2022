@@ -23,18 +23,18 @@ filename_dprss <- "2022-02-dprss-names.csv"
 filename_dprss <- paste0(folder,filename_dprss)
 
 #read in csv
-dfhf <- read_csv(filename)
+dfpath <- read_csv(filename)
 #this doesn't fix accents!
-#dfhf <- read_csv(filename, locale=locale("fr"))
+#dfpath <- read_csv(filename, locale=locale("fr"))
 
-names(dfhf)
+names(dfpath)
 # [1] "R\xe9gion M\xe9dicale" "District de Sant\xe9"  "Structure sanitaire"   "Type structure"       
 # [5] "Autre type structure"  "Statut" "Latitude"              "Longitude"    
 
 #1 convert encoding, 2 remove accents 3 to-lower
-#names(dfhf) <- str_to_lower(stringi::stri_trans_general(str_conv(names(dfhf), encoding = "ISO-8859-1"), "Latin-ASCII"))
+#names(dfpath) <- str_to_lower(stringi::stri_trans_general(str_conv(names(dfpath), encoding = "ISO-8859-1"), "Latin-ASCII"))
 
-names(dfhf) <- names(dfhf) %>% 
+names(dfpath) <- names(dfpath) %>% 
   #fix accents
   str_conv(encoding = "ISO-8859-1") %>% 
   #remove accents
@@ -51,9 +51,9 @@ names(dfhf) <- names(dfhf) %>%
 
 #hf has 1485 facilities
 #121 in St Louis district
-dfhf_sl <- dfhf %>% filter(region_medicale=="Saint Louis")
+dfpath_sl <- dfpath %>% filter(region_medicale=="Saint Louis")
 
-table(dfhf_sl$type_structure)
+table(dfpath_sl$type_structure)
 # autre   CMG    CS    HP    PS    RM 
 #     2     1     6     1   110     1 
 #HP hopital - level 3
@@ -202,4 +202,13 @@ sfadm2$shapeName
 # [41] "Tambacounda"       "Thies"             "Tivaoune"          "Velingara"        
 # [45] "Ziguinchor" 
 
+
+# This legend appears in one file
+# Type structure	
+# PS	Poste de Santé
+# DS	District de Sanitaire (Centre de santé)
+# CS	Centre de Santé
+# HP	Hopital
+# RM	Région Médical
+# autre	(Clinique, maternité, unité de vaccination, Dispensaire, etc;)
 

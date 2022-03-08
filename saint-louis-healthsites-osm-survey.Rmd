@@ -23,7 +23,7 @@ library(tmap)
 ```
 
 
-```{r read-data, include=FALSE}
+```{r read-data-osm, include=FALSE}
 
 # get local file data, can't share yet
 folder <- "C:\\Users\\andy.south\\Google Drive\\afrimapr-gdrive\\Proposals\\2022-01-senegal-covidaction\\data\\"
@@ -73,7 +73,7 @@ table(dfosm2$facility_category)
 
 ```
 
-```{r make-geo, include=FALSE}
+```{r make-geo-osm, include=FALSE}
 
 sfosm <- st_as_sf(dfosm2, 
                   coords=c("longitude", "latitude"), 
@@ -83,9 +83,11 @@ sfosm <- st_as_sf(dfosm2,
 ```
 
 
-## Categories of OSM health facilities Saint Louis
+### Categories of OSM health facilities Saint Louis
 
-```{r map-osm-sl, eval=TRUE, fig.height=4.5, fig.width=7.5, fig.show='hold'}
+```{r map-osm-sl, eval=TRUE, fig.height=4}
+
+#, fig.show='hold'
 
 library(tmap)
 library(afriadmin)
@@ -119,7 +121,6 @@ tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
     tm_borders("black", lwd = .5) +
   
   tm_shape(sfosm) +
-    #tm_dots(shape=3, size = 0.15, col='red', border.lwd = 0.2) +
   
   # table(dfosm$operator_type)
   #Community Government    Private     Public  Religious 
@@ -163,12 +164,15 @@ library(ggrepel)
 gg <- ggplot(filter(sfsen_adm1, shapeName=="Saint Louis")) +
     geom_sf() +
     theme_void() + 
-    geom_sf(data=sfosm, size=1) +
+    geom_sf(data=sfosm, size=0.3) +
     geom_text_repel(data=sfosm, aes(label=.data[[column_to_map]], geometry=geometry),
                      stat="sf_coordinates",
-                     segment.size = 0.2, segment.alpha = 0.7,
+                     #padding default is 0.25
+                     box.padding = 0.1,
+                     #force=0.5,
+                     segment.size = 0.1, segment.alpha = 0.7,
                      #point.padding = NA, #allows points to overlap centroid
-                     colour='red', size=2
+                     colour='red', size=1.9
                     ) +
     labs(title = paste("OSM", column_to_map))
     
@@ -189,4 +193,107 @@ plot(gg)
 }
 
 ```
+
+## Compare OSM survey data to PATH data
+
+```{r read-data-path, include=FALSE}
+
+# get local file data, can't share yet
+
+# saved first sheet from xls as csv
+# xls emailed from Mark 
+
+folder <- "C:\\Users\\andy.south\\Google Drive\\afrimapr-gdrive\\Proposals\\2022-01-senegal-covidaction\\data\\"
+filename <- "2022-02-senegal-structures.csv"
+filename <- paste0(folder,filename)
+
+#read in csv
+#encoding fixes accents
+dfpath <- read_csv(filename, locale=locale(encoding = "ISO-8859-1"))
+
+# [1] "Région Médicale"      "District de Santé"    "Structure sanitaire"  "Type structure" 
+# [5] "Autre type structure" "Statut"               "Latitude"             "Longitude"   
+
+
+#convert column names to lowercase & remove any accents and spaces
+names(dfpath) <- names(dfpath) %>% 
+  #fix accents
+  #str_conv(encoding = "ISO-8859-1") %>% 
+  #remove accents
+  stringi::stri_trans_general("Latin-ASCII") %>%
+  #lower case
+  str_to_lower() %>% 
+  #replace spaces with _
+  str_replace_all("\\s", "_")
+
+table(dfpath$type_structure)
+# autre   CMG    CS    HP    PS    RM 
+#    36     1   100    12  1322    14 
+
+# This legend appears in one file
+# Type structure	
+# PS	Poste de Santé
+# DS	District de Sanitaire (Centre de santé)
+# CS	Centre de Santé
+# HP	Hopital
+# RM	Région Médical
+# autre	(Clinique, maternité, unité de vaccination, Dispensaire, etc;)
+
+table(dfpath$statut) #priv-publ
+# Communautaire    Prive conf    Prive laic        Public 
+#             1            39            35          1410 
+```
+
+```{r make-geo-path, include=FALSE}
+
+sfpath <- st_as_sf(dfpath, 
+                  coords=c("longitude", "latitude"), 
+                  na.fail = FALSE, crs=4326)
+
+sfpath_sl <- filter(sfpath, region_medicale == "Saint Louis")
+
+table(sfpath_sl$type_structure)
+# autre   CMG    CS    HP    PS    RM 
+#     2     1     6     1   110     1 
+
+```
+
+```{r map-path-osm-sl, eval=TRUE, fig.height=4}
+
+#, fig.show='hold'
+
+library(tmap)
+library(afriadmin)
+
+sfsen_adm0 <- afriadmin('senegal',level=0, plot=FALSE)
+sfsen_adm1 <- afriadmin('senegal',level=1, plot=FALSE)
+   
+#map statut (publ/priv)
+tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+    tm_borders("grey", lwd = .5) +
+    tm_shape(sfsen_adm0) +
+    tm_borders("black", lwd = .5) +
+  
+  tm_shape(sfpath_sl) +
+
+  #0square,1circle,2triangle,3+,4x
+  
+    tm_symbols(shape="statut", col='darkgreen', shapes=c(0,1,2,3), size=0.3) +
+  
+   tm_shape(sfosm) +
+  
+  # table(dfosm$operator_type)
+  #Community Government    Private     Public  Religious 
+  #      29          2         74        261          1 
+  #0square,1circle,2triangle,3+,4x
+  
+    tm_symbols(shape="operator_type", col='red', shapes=c(0,1,2,3,4), size=0.05) + 
+  
+    tm_layout(main.title='OSM(red) & PATH(green) health facilities Saint Louis 2022', main.title.size=1,
+              legend.bg.color=TRUE, legend.position=c("center","BOTTOM"),
+              title="map by @afrimapr", title.color="darkgrey", title.size=0.8, title.position=c("RIGHT","BOTTOM")) #main.title goes above map
+
+
+```
+
 
