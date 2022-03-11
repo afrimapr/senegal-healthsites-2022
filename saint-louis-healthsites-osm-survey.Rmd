@@ -267,9 +267,10 @@ library(afriadmin)
 
 sfsen_adm0 <- afriadmin('senegal',level=0, plot=FALSE)
 sfsen_adm1 <- afriadmin('senegal',level=1, plot=FALSE)
+sfsen_adm1_sl <- filter(sfsen_adm1, shapeName=="Saint Louis")
    
 #map statut (publ/priv)
-tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+tmap::tm_shape(sfsen_adm1_sl) +
     tm_borders("grey", lwd = .5) +
     tm_shape(sfsen_adm0) +
     tm_borders("black", lwd = .5) +
@@ -295,5 +296,25 @@ tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
 
 
 ```
+
+```{r map-path-osm-sl-dept, eval=TRUE, fig.height=4}
+
+sfsen_adm2 <- afriadmin('senegal',level=2, plot=FALSE)
+#subset adm2 for Saint Louis
+#sfsen_adm2_sl <- sfsen_adm2[sfsen_adm1_sl,]
+#sfsen_adm2_sl <- st_intersection(sfsen_adm2, sfsen_adm1_sl)
+
+#unfortunately this includes more than 3 expected depts
+#mapview(sfsen_adm2_sl, zcol="shapeName")
+
+#simpler way
+sfsen_adm2_sl <- filter(sfsen_adm2, shapeName %in% c("Saint Louis","Dagana","Podor"))
+
+# TODO
+# loop through the 3 depts & make a map for each
+
+
+```
+
 
 

@@ -19,6 +19,7 @@ library(knitr)
 library(tidyverse)
 library(sf)
 library(tmap)
+library(mapview)
 
 ```
 
@@ -69,6 +70,75 @@ table(dfpath$type_structure)
 table(dfpath$statut) #priv-publ
 # Communautaire    Prive conf    Prive laic        Public 
 #             1            39            35          1410 
+
+
+filename_districts <- "2022-02-senegal-health-districts.csv"
+filename_districts <- paste0(folder,filename_districts)
+
+dfdistricts <- read_csv(filename_districts, locale=locale(encoding = "ISO-8859-1"))
+#remove last row which contains NA & breaks sf conversion later
+dfdistricts <- filter(dfdistricts,!is.na(Polygones))
+
+names(dfdistricts)
+#[1] "Région Médicale"   "District de Santé" "Polygones" 
+#get rid of accents, lowercase & replace spaces
+
+names(dfdistricts) <- names(dfdistricts) %>% 
+  #remove accents
+  stringi::stri_trans_general("Latin-ASCII") %>%
+  #lower case
+  str_to_lower() %>% 
+  #replace spaces with _
+  str_replace_all("\\s", "_")
+
+
+#sfdistricts <- st_as_sf(dfdistricts, wkt="Polygones")
+# OGR: Unsupported geometry type
+# Error in CPL_sfc_from_wkt(x) : OGR error
+
+#this is what Geometry column looks like
+# dfdistricts$Polygones[1]
+# [1] "[[[[-17.4760,14.6985],[-17.4736,14.7306],[-17.4251,14.7447],[-17.4135,14.7329],[-17.4342,14.6821],[-17.4481,14.6978],[-17.4612,14.6781],[-17.4760,14.6985]]]]"
+
+#nearly but not quite
+#https://gis.stackexchange.com/questions/387069/how-to-read-csv-polygon-data-with-sf
+#seems like I could remove []
+#and add POLYGON 
+#I got to this
+#"LINESTRING ((-17.4760,14.6985,-17.4736,14.7306,-17.4251,14.7447,-17.4135,14.7329,-17.4342,14.6821,-17.4481,14.6978,-17.4612,14.6781,-17.4760,14.6985))"
+#but still need to remove every other comma
+
+#it should apparently look something like this, although this is 3D so has 4 items
+#"POLYGON ((5 50 0 0.5, 20 50 0 0.5, 5 40 0 0.5, 20 40 0 0.5))"
+
+dfdistricts <- dfdistricts %>%
+                  #use temp X that later replace with comma
+                  mutate(geo=str_replace_all(polygones,"\\],\\["," X ")) %>%   
+                  mutate(geo=str_replace_all(geo,"\\[","")) %>% 
+                  mutate(geo=str_replace_all(geo,"\\]","")) %>% 
+                  mutate(geo=str_replace_all(geo,","," ")) %>% 
+                  mutate(geo=str_replace_all(geo," X ",", ")) %>%   
+                  mutate(geo=paste0("POLYGON ((",geo,"))"))  
+                  #mutate(geo=paste0("LINESTRING ((",geo,"))"))  
+
+sfdistricts <- st_as_sf(dfdistricts, wkt="geo", crs=4326)
+
+#sfdistricts_sl <- filter(sfdistricts, `Région Médicale`=="RM Saint-Louis")
+sfdistricts_sl <- filter(sfdistricts, region_medicale=="RM Saint-Louis")
+
+# alas this seems to crash mapview
+#mapview::mapview(sfdistricts_sl, zcol="District de Santé")
+
+gg <- ggplot(sfdistricts_sl) +
+    geom_sf() +
+    theme_void() +
+        geom_text(aes(label=district_de_sante, geometry=geo),
+                     stat="sf_coordinates",
+                     colour='darkgreen', size=4
+                    )
+    #geom_text( aes(label=district_de_sante))
+    #geom_text( aes(label=`District de Santé`))
+
 ```
 
 ```{r make-geo-path, include=FALSE}
@@ -136,6 +206,8 @@ tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
 
 ```
 
+
+### health districts from PATH data
 
 
 

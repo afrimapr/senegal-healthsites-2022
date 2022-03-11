@@ -40,7 +40,24 @@ filename_lamine <- paste0(folder,filename_lamine)
 filename_dprss <- "2022-02-dprss-names.csv"
 filename_dprss <- paste0(folder,filename_dprss)
 
-##reading in data
+filename_districts <- "2022-02-senegal-health-districts.csv"
+filename_districts <- paste0(folder,filename_districts)
+
+dfdistricts <- read_csv(filename_districts, locale=locale(encoding = "ISO-8859-1"))
+#remove last row which contains NA & breaks sf conversion later
+dfdistricts <- filter(dfdistricts,!is.na(Polygones))
+
+names(dfdistricts)
+#[1] "Région Médicale"   "District de Santé" "Polygones" 
+#get rid of accents, lowercase & replace spaces
+
+names(dfdistricts) <- names(dfdistricts) %>% 
+  #remove accents
+  stringi::stri_trans_general("Latin-ASCII") %>%
+  #lower case
+  str_to_lower() %>% 
+  #replace spaces with _
+  str_replace_all("\\s", "_")
 
 
 #no header in the dprss file
@@ -259,3 +276,47 @@ plot(gg)
 
 ```
 
+
+
+```{r map-cous-osm-lits, eval=FALSE, fig.height=2.5, fig.show='hold'}
+
+#eval=FALSE because not very informative
+#would be better just to do a table for Cous vs OSM survey
+
+### Compare COUS & OSM-SURVEY bed data
+
+# TODO add the osm num beds to the plot
+# labels and points too
+# dfosm2$number_of_beds
+
+  
+column_to_map <- "lits_en_medecine_"
+column_to_map_osm <- "number_of_beds"
+
+gg <- ggplot(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+    geom_sf() +
+    theme_void() + 
+    geom_sf(data=sfcous_sl) +
+    geom_text_repel(data=sfcous_sl, aes(label=.data[[column_to_map]], geometry=geometry),
+                     stat="sf_coordinates",
+                     #point.padding = NA, #allows points to overlap centroid
+                     colour='darkgreen', size=4
+                    ) +
+    geom_sf(data=sfosm, size=0.1) +
+    geom_text_repel(data=sfosm, aes(label=.data[[column_to_map_osm]], geometry=geometry),
+                     stat="sf_coordinates",
+                     #padding default is 0.25
+                     box.padding = 0.1,
+                     #force=0.5,
+                     segment.size = 0.1, segment.alpha = 0.7,
+                     #point.padding = NA, #allows points to overlap centroid
+                     colour='red', size=1.9
+                    ) +
+  
+    labs(title = paste("COUS", column_to_map))
+    
+
+plot(gg)
+
+
+```
