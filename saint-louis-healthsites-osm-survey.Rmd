@@ -50,21 +50,45 @@ names(dfosm) <- names(dfosm) %>%
   #remove _facility_location_ before coords
   str_replace_all("_facility_location_", "") %>% 
   str_replace_all("\\?", "") %>%   
-  str_replace_all("what_is_the_number_of_", "") 
+  str_replace_all("what_is_the_number_of_", "") %>% 
+  str_replace_all("speciality_medical_equipment_available/","") %>% 
+  str_replace_all("available_services/","") %>% 
+  str_replace_all("does_this_facility_provide_","")
 
 #dfosm$in_which_health_zone_is_the_facility_located
 #[1] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA 
 
-dfosm2 <- dfosm %>% select(name_of_facility, 
-                           city, 
-                           operator_type, 
-                           longitude, 
-                           latitude, 
-                           operational_status,
-                           facility_category,
-                           number_of_beds,
-                           number_of_doctors,
-                           number_of_nurses)
+# dfosm2 <- dfosm %>% select(name_of_facility, 
+#                            city, 
+#                            operator_type, 
+#                            longitude, 
+#                            latitude, 
+#                            operational_status,
+#                            facility_category,
+#                            number_of_beds,
+#                            number_of_doctors,
+#                            number_of_nurses)
+
+# which column from original osm data contains the data ?
+ #  [8] "name_of_facility" 
+ # [16] "operator_type" 
+ # [19] "latitude"          
+ # [20] "longitude" 
+# [48] "facility_category"  
+# [54] "functional_medicalized_ambulances" 
+# [55] "functional_non-medical_ambulances"
+# [63] "functional_ambulance_launches"    
+# [124] "state_midwives"  
+# [210] "available_services"
+# [222] "birthing_center"   
+# [234] "emergency_department"              
+# [235] "does_this_facility_provide_emergency_services"  
+# [237] "number_of_beds"                                                                          
+# [238] "number_of_doctors"                                                                       
+# [239] "number_of_nurses"   
+
+dfosm2 <- dfosm[,c(8,16,19,20,48,54,55,63,124,210,222,234,235,237,238,239)]
+
 
 table(dfosm2$facility_category)
 # Clinic  Dentist  Doctors Hospital Pharmacy 
@@ -286,7 +310,7 @@ tmap::tm_shape(sfsen_adm1_sl) +
   # table(dfosm$operator_type)
   #Community Government    Private     Public  Religious 
   #      29          2         74        261          1 
-  #0square,1circle,2triangle,3+,4x
+  #shape 0square,1circle,2triangle,3+,4x
   
     tm_symbols(shape="operator_type", col='red', shapes=c(0,1,2,3,4), size=0.05) + 
   
@@ -297,7 +321,7 @@ tmap::tm_shape(sfsen_adm1_sl) +
 
 ```
 
-```{r map-path-osm-sl-dept, eval=TRUE, fig.height=4}
+```{r map-path-osm-sl-dept, eval=FALSE, fig.height=4}
 
 sfsen_adm2 <- afriadmin('senegal',level=2, plot=FALSE)
 #subset adm2 for Saint Louis
@@ -311,10 +335,69 @@ sfsen_adm2 <- afriadmin('senegal',level=2, plot=FALSE)
 sfsen_adm2_sl <- filter(sfsen_adm2, shapeName %in% c("Saint Louis","Dagana","Podor"))
 
 # TODO
-# loop through the 3 depts & make a map for each
-
+# better to use 5 health districts - I have the data from PATH
 
 ```
 
+```{r map-emergency-osm, eval=TRUE, fig.height=4}
+
+# request from Mark
+# Can you create a map thsat shows the Emergency health services?
+# As a pregnant women I want to have access to an ambulance or convenient transportation should I need to access emergency health services during labor.
+
+# which column from original osm data contains the data ?
+ #  [8] "name_of_facility" 
+ # [16] "operator_type" 
+ # [19] "latitude"          
+ # [20] "longitude" 
+# [54] "functional_medicalized_ambulances" 
+# [55] "functional_non-medical_ambulances"
+# [63] "functional_ambulance_launches"    
+# [124] "state_midwives"  
+# [210] "available_services"
+# [222] "birthing_center"   
+# [234] "emergency_department"              
+# [235] "emergency_services"  
+# [237] "number_of_beds"                                                                          
+# [238] "number_of_doctors"                                                                       
+# [239] "number_of_nurses"   
+
+#dfosm_emergency <- dfosm[,c(8,16,19,20,54,55,63,124,210,222,234,235,237,238,239)]
+
+#table(dfosm$emergency_services)
+# No NON OUI Yes 
+# 265   7  17  46 
+
+#sfosm_emergency <- filter(sfosm, emergency_services=="Yes")
+sfosm_emergency <- filter(sfosm, emergency_services%in%c("Yes","OUI"))
+sfosm_emergency$emergency_services <- "Yes" 
+
+sfosm_birthing <- filter(sfosm, birthing_center==1)
+
+gg <- ggplot(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+    geom_sf() +
+    theme_void() + 
+    geom_sf(data=sfosm, size=0.3) +
+    #geom_sf(data=sfosm_emergency, colour='red', size=5, shape="+", show.legend="point") +
+    geom_sf(data=sfosm_emergency, aes(colour=emergency_services), size=5, shape="+", show.legend="point") +
+    theme(legend.position = "bottom") +
+    labs(title = paste("Facilities providing Emergency services, OSM-Senegal survey"))
+
+gg
+
+#birthing centers
+#shape 0square,1circle,2triangle,3+,4x
+gg <- ggplot(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+    geom_sf() +
+    theme_void() + 
+    geom_sf(data=sfosm, size=0.3) +
+    geom_sf(data=sfosm_birthing, colour="blue", size=3, shape=1) +
+    # geom_sf(data=sfosm_birthing, aes(colour=birthing_center), size=3, shape=1, show.legend="point") +
+    # theme(legend.position = "bottom") +
+    labs(title = paste("Facilities with Birthing centres, OSM-Senegal survey"))
+
+gg
+
+```
 
 
