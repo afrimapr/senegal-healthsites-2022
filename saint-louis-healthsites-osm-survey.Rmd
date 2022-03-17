@@ -107,7 +107,8 @@ sfosm <- st_as_sf(dfosm2,
 ```
 
 
-### Categories of OSM health facilities Saint Louis
+### Categories of health facilities Saint Louis from OSM survey
+
 
 ```{r map-osm-sl, eval=TRUE, fig.height=4}
 
@@ -303,7 +304,7 @@ tmap::tm_shape(sfsen_adm1_sl) +
 
   #0square,1circle,2triangle,3+,4x
   
-    tm_symbols(shape="statut", col='darkgreen', shapes=c(0,1,2,3), size=0.3) +
+   tm_symbols(shape="statut", col='darkgreen', shapes=c(0,1,2,3), size=0.3) +
   
    tm_shape(sfosm) +
   
@@ -401,3 +402,26 @@ gg
 ```
 
 
+
+```{r mapview-path-osm, eval=FALSE, fig.height=4}
+
+# to compare PATH & osm-survey data in interactive map
+# will only work in html not pdf.
+# or could put into a shiny app
+
+#todo get label working
+
+mapvosm <- mapview::mapview(sfosm,
+                            zcol="facility_category",
+                            label=paste("osm:",sfosm[["name_of_facility"]]),
+                            col.regions = RColorBrewer::brewer.pal(9, "YlGn"))
+
+mapvpath <- mapview::mapview(sfpath_sl,
+                             zcol="type_structure",
+                             label=paste("osm:",sfpath_sl$structure_sanitaire),
+                             col.regions = RColorBrewer::brewer.pal(9, "BuPu"))
+
+mapvosm + mapvpath
+
+
+```
