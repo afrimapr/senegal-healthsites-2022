@@ -128,16 +128,9 @@ sfdistricts_sl <- filter(sfdistricts, region_medicale=="RM Saint-Louis")
 
 # alas this seems to crash mapview
 #mapview::mapview(sfdistricts_sl, zcol="District de Santé")
+# does work in ggplot see lower
 
-gg <- ggplot(sfdistricts_sl) +
-    geom_sf() +
-    theme_void() +
-        geom_text(aes(label=district_de_sante, geometry=geo),
-                     stat="sf_coordinates",
-                     colour='darkgreen', size=4
-                    )
-    #geom_text( aes(label=district_de_sante))
-    #geom_text( aes(label=`District de Santé`))
+
 
 ```
 
@@ -209,5 +202,16 @@ tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
 
 ### health districts from PATH data
 
+```{r map-path-sl-districts, eval=TRUE, fig.height=4}
 
+gg <- ggplot(sfdistricts_sl) +
+    geom_sf() +
+    theme_void() +
+        geom_text(aes(label=district_de_sante, geometry=geo),
+                     stat="sf_coordinates",
+                     colour='darkgreen', size=4
+                    )
+gg
+
+```
 
