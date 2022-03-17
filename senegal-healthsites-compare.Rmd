@@ -184,6 +184,8 @@ We can compare the COUS & DPRS tables above to check whether the facility names 
 
 An initial search by eye shows the mismatches between naming in the two datasets. There is at least one facility in the COUS data that seems not present in the DPRS list (Centre de Sante Amadou Malick Gaye).
 
+See section below for Comparison of facility naming between DPRS and the new OSM-Senegal survey.
+
 ```{r cous-dprs-names}
 
 knitr::kable(dfcousnames)
@@ -380,7 +382,7 @@ Senegal level | Senegal type | Senegal abbreviation | OSM category
 2            | Centre de Santé    | CS | Clinic 
 2            | District de Sanitaire    | DS | Clinic 
 3            | Poste de Santé | PS | Doctors 
-3            | Case de Santé | ?CS | Doctors 
+3            | Case de Santé | Case de | Doctors 
 
 ```{r map-osm-sl, eval=TRUE, fig.height=4}
 
@@ -529,5 +531,65 @@ gg <- ggplot(filter(sfsen_adm1, shapeName=="Saint Louis")) +
     
 
 plot(gg)
+
+```
+
+### Comparison of facility naming between DPRS and the new OSM-Senegal survey
+
+Can we automatically match facility names in the OSM-Senegal survey data with their equivalent names used by DPRS ?
+
+The DPRS data mostly uses abbreviations for facility categories.
+
+Senegal level | OSM naming | DPRS abbreviation 
+------: | ------------ | ----- 
+1            | Hopital    | HP 
+1            | Établissement public de santé | EPS 
+2            | Centre de Santé    | CS 
+2            | District de Sanitaire    | DS 
+3            | Poste de Santé | PS 
+3            | Case de Santé | Case de 
+
+TODO what is PM ?
+
+There are also differences in upper/lower case, accents, use of 'de' & spaces.
+
+We can try the following to match the names
+
+1. expanding the abbreviations from DPRS
+1. remove accents
+1. convert to lower case
+1. ensure just single spaces
+1. remove 'de'
+
+
+```{r compare-dprs-osm-names}
+
+#knitr::kable(dfdprs[1:9,])
+
+dfdprs <- dfdprs %>% 
+  mutate(name_simple = dprs_names)
+
+#may be better way of doing - does work though
+dfdprs$name_simple <- dfdprs$name_simple %>%
+  #expand dprs abbreviations
+  str_replace_all("HP", "Hopital") %>%
+  str_replace_all("EPS", "Établissement public de santé") %>%
+  str_replace_all("CS", "Centre de Santé") %>%
+  str_replace_all("DS", "District de Sanitaire") %>%
+  str_replace_all("PS", "Poste de Santé") %>%  
+  str_replace_all("Case", "Case de Santé") %>% 
+  #remove accents
+  stringi::stri_trans_general("Latin-ASCII") %>%
+  #remove de
+  str_replace_all("de", "") %>% 
+  #lower case
+  str_to_lower() %>%
+  str_squish() #remove whitespace from either side & repeats in middle
+  #replace spaces with _
+  #str_replace_all("\\s", "_")
+
+#TODO create simple names for osm data
+
+
 
 ```
