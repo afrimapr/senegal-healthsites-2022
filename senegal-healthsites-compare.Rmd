@@ -1,7 +1,7 @@
 ---
 title: "Comparing health facility location data available for Saint Louis, Senegal"
 #output: html_document
-author: "Andy South @afrimapr"
+author: "Andy South @afrimapr, Mark Herringer @sharehealthdata, Lamine Ndiaye @lamineyasey"
 date: "DRAFT `r Sys.Date()`"
 output: pdf_document
 urlcolor: blue
@@ -9,6 +9,8 @@ always_allow_html: true
 ---
 
 This is a data-driven document [open-source code here](https://github.com/afrimapr/senegal-healthsites-2022/blob/master/senegal-healthsites-compare.Rmd)   
+
+Funded by COVIDaction Vaccine Data Co-Lab - [Healthsites.io](https://healthsites.io/) Emergency health data validation.
 
 Initial comparison of data provided by COUS [Centre des Opérations d'Urgence Sanitaire](https://www.sante.gouv.sn/les-services-rattaches/le-centre-des-op%C3%A9rations-durgence-sanitaire-cous) & DPRS [Direction de la Planification, de la Recherche et des Statistiques](https://www.sante.gouv.sn/les-directions/la-direction-de-la-planification-de-la-recherche-et-des-statistiques-0) for Saint Louis with OSM Senegal survey conducted in February 2022.
 
@@ -366,6 +368,19 @@ sfosm <- st_as_sf(dfosm2,
 
 
 ### Categories of facilities in OSM-Senegal survey
+
+Senegal health facility levels are converted into OSM categories of Hospital, Clinic, Doctor as follows :
+
+Senegal level | Senegal type | Senegal abbreviation | OSM category
+------: | ------------ | ----- | -----  
+1            | Hopital    | HP | Hospital 
+1            | Etablissement public de Santé 1 (départementale)| EPS 1 | Hospital
+1            | Etablissement public de Santé 2 (régionale)| EPS 2 | Hospital
+1            | Etablissement public de Santé 3 (nationale) | EPS 3 | Hospital
+2            | Centre de Santé    | CS | Clinic 
+2            | District de Sanitaire    | DS | Clinic 
+3            | Poste de Santé | PS | Doctors 
+3            | Case de Santé | ?CS | Doctors 
 
 ```{r map-osm-sl, eval=TRUE, fig.height=4}
 
