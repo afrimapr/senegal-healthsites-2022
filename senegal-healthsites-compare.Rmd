@@ -538,6 +538,8 @@ plot(gg)
 
 Can we automatically match facility names in the OSM-Senegal survey data with their equivalent names used by DPRS ?
 
+In short, not with the raw data. Trying to match the exact names results in zero matches between DPRS & OSM. This can be addressed.
+
 The DPRS data mostly uses abbreviations for facility categories.
 
 Senegal level | OSM naming | DPRS abbreviation 
@@ -549,7 +551,7 @@ Senegal level | OSM naming | DPRS abbreviation
 3            | Poste de Santé | PS 
 3            | Case de Santé | Case de 
 
-TODO what is PM ?
+Other DPRS abbreviations DPC (3), PM (9 of them).
 
 There are also differences in upper/lower case, accents, use of 'de' & spaces.
 
@@ -560,17 +562,22 @@ We can try the following to match the names
 1. convert to lower case
 1. ensure just single spaces
 1. remove 'de'
+1. remove '[-] ' which indicates hierarchy in DPRS
 
+We can apply these approaches to both datasets, then we get simplified names. **137** of these simplified names from the OSM-survey data match with the DPRS list. Here are the first few as an example. 
 
 ```{r compare-dprs-osm-names}
 
-#knitr::kable(dfdprs[1:9,])
 
 dfdprs <- dfdprs %>% 
-  mutate(name_simple = dprs_names)
+  mutate(dprs_name_simple = dprs_names)
 
 #may be better way of doing - does work though
-dfdprs$name_simple <- dfdprs$name_simple %>%
+dfdprs$dprs_name_simple <- dfdprs$dprs_name_simple %>%
+  #remove symbols (84) that indicate regions & higher order facilities
+  #will leave a few rows in for regions
+  #but doesn't matter too much given that we are mostly trying to match OSM names to this
+  str_replace_all("\\[-] ", "") %>%
   #expand dprs abbreviations
   str_replace_all("HP", "Hopital") %>%
   str_replace_all("EPS", "Établissement public de santé") %>%
@@ -589,7 +596,58 @@ dfdprs$name_simple <- dfdprs$name_simple %>%
   #str_replace_all("\\s", "_")
 
 #TODO create simple names for osm data
+dfosm2 <- dfosm2 %>% 
+  mutate(osm_name_simple = name_of_facility)
+
+dfosm2$osm_name_simple <- dfosm2$osm_name_simple %>%
+  #remove accents
+  stringi::stri_trans_general("Latin-ASCII") %>%
+  #remove de
+  str_replace_all("de", "") %>% 
+  #lower case
+  str_to_lower() %>%
+  str_squish() #remove whitespace from either side & repeats in middle
+
+#test how many names match between the two columns to start with
+dfosm_matches_dprs_fullname <- dfosm %>% 
+  filter(name_of_facility %in% dfdprs$dprs_names)
+#nrow(dfosm_matches_dprs_fullname)
+#0 matches !
+
+#test how many of the simple names match - 137
+dfosm_matches_dprs_name_simple <- dfosm2 %>% 
+  filter(dfosm2$osm_name_simple %in% dfdprs$dprs_name_simple)
+
+#nrow(dfosm_matches_dprs_name_simple)
+#137
 
 
+knitr::kable(dfosm_matches_dprs_name_simple$osm_name_simple[1:9])
+
+
+```
+
+This leaves **257** facilities in the OSM survey data that do not match names in the DPRS data. This can be because :
+
+1. facility is not present in DPRS (note the survey included pharmacies not present in DPRS)
+1. the simplified name still differs from how the same facility is named within the OSM data.
+
+The 257 un-matched names are shown in the table below.
+
+```{r table-no-match-dprs-osm-names}
+
+dfosm_no_match_dprs <- dfosm2 %>% 
+  filter(!dfosm2$osm_name_simple %in% dfdprs$dprs_name_simple)
+
+#nrow(dfosm_no_match_dprs) #257
+
+#paste result into a table with 3 columns
+#86 - 172 - 257
+names_no_match <- dfosm_no_match_dprs$osm_name_simple 
+dftable <- data.frame(unmatched_osm_names=names_no_match[1:86],
+                      x2=names_no_match[87:172],
+                      x3=names_no_match[172:257])
+
+knitr::kable(dftable)
 
 ```
