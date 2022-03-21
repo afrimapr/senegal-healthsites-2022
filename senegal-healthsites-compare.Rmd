@@ -51,8 +51,10 @@ library(tmap)
 
 # get local file data, can't share yet
 folder <- "C:\\Users\\andy.south\\Google Drive\\afrimapr-gdrive\\Proposals\\2022-01-senegal-covidaction\\data\\"
-filename <- "2022-02-senegal-structures.csv"
-filename <- paste0(folder,filename)
+
+#data from PATH not used here
+# filename <- "2022-02-senegal-structures.csv"
+# filename <- paste0(folder,filename)
 
 filenamecous_sl <- "2022-02-20-cous10-stlouis-anon.csv"
 filenamecous_sl <- paste0(folder,filenamecous_sl)
@@ -64,6 +66,7 @@ filename_lamine <- paste0(folder,filename_lamine)
 filename_dprs <- "2022-02-dprs-names.csv"
 filename_dprs <- paste0(folder,filename_dprs)
 
+#health district outlines from PATH
 filename_districts <- "2022-02-senegal-health-districts.csv"
 filename_districts <- paste0(folder,filename_districts)
 
@@ -178,7 +181,7 @@ Looking at the first 9 rows of the DPRS data.
 knitr::kable(dfdprs[1:9,])
 
 ```
-We can see that sometimes rows indicate regions, e.g. `[-] RM Saint-Louis` and `[-] Dagana`. Also sometimes a row with a `[-]` indicates a facility that has control over others e.g. `[-] PS Bokhol`. This makes it difficult to analyse the data automatically because it is difficult to detect whether a row refers to a facility or not. It may be that if a row has a [-] and does not have PS, CS or Case then it is not a facility.
+We can see that sometimes rows indicate regions, e.g. `[-] RM Saint-Louis` and `[-] Dagana`. Also sometimes a row with a `[-]` indicates a facility that has control over others e.g. `[-] PS Bokhol`. Seems that if a row has a [-] and does not have PS, CS or Case then it is a region instead of a facility - this could be extracted automatically.
 
 We can compare the COUS & DPRS tables above to check whether the facility names in the COUS data appear exactly the same as in the DPRS data. We would need to be able to write code to find matching names to be able to write a reproducible pipeline for comparing data.
 
