@@ -611,6 +611,9 @@ sfosm <- sfosm %>%
 
 kable(table(sfosm$emergency_pregnancy, dnn="Facility likely to support emergency pregnancy"))
 
+#can I order rows to make sure emergency facilities paint on top ?
+sfosm <- arrange(sfosm, emergency_pregnancy)
+
 #map emergency_pregnancy
 tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
     tm_borders("grey", lwd = .5) +
@@ -624,7 +627,7 @@ tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
   #shape="emergency_pregnancy"
   
     tm_symbols(col="emergency_pregnancy", 
-               palette=c('darkgreen','red'), 
+               palette=c('lightblue','red'), 
                size=0.1,
                border.lwd=NA,
                alpha=0.8) +
@@ -636,6 +639,19 @@ tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
 
 ```
 
+```{r map-interactive-osm-pregancy-user, eval=FALSE}
+
+# eval FALSE
+# how to make an interactive map for the emergency pregnancy user story
+
+mapvosm <- mapview::mapview(sfosm,
+                            zcol="emergency_pregnancy",
+                            label=paste("osm:",sfosm[["name_of_facility"]]),
+                            col.regions = c('lightblue','red'))                            
+                            #col.regions = RColorBrewer::brewer.pal(9, "RdGn"))
+
+
+```
 
 ### Comparison of facility naming between DPRS and the new OSM-Senegal survey
 
