@@ -598,7 +598,7 @@ dfdprs$dprs_name_simple <- dfdprs$dprs_name_simple %>%
   #replace spaces with _
   #str_replace_all("\\s", "_")
 
-#TODO create simple names for osm data
+#create simple names for osm data
 dfosm2 <- dfosm2 %>% 
   mutate(osm_name_simple = name_of_facility)
 
@@ -630,26 +630,38 @@ knitr::kable(dfosm_matches_dprs_name_simple$osm_name_simple[1:9])
 
 ```
 
-This leaves **257** facilities in the OSM survey data that do not match names in the DPRS data. This can be because :
+This leaves **301** facilities in the OSM survey data that do not match names in the DPRS data. This can be because :
 
-1. facility is not present in DPRS (note the survey included pharmacies not present in DPRS)
+1. facility is not present in DPRS (note the survey included 61 pharmacies and 2 dentists not present in DPRS)
 1. the simplified name still differs from how the same facility is named within the OSM data.
 
-The 257 un-matched names are shown in the table below.
+Removing pharmacies & dentists leaves **238** un-matched names shown in the table below.
 
 ```{r table-no-match-dprs-osm-names}
 
 dfosm_no_match_dprs <- dfosm2 %>% 
-  filter(!dfosm2$osm_name_simple %in% dfdprs$dprs_name_simple)
+  filter(!dfosm2$osm_name_simple %in% dfdprs$dprs_name_simple) 
 
-#nrow(dfosm_no_match_dprs) #257
+dfosm_no_match_dprs_nopharm <- dfosm_no_match_dprs %>% 
+  filter(!facility_category %in% c("Dentist","Pharmacy")) 
+  
+#nrow(dfosm_no_match_dprs) #301
+#nrow(dfosm_no_match_dprs_nopharm) #238
+
+kable(table(dfosm_no_match_dprs$facility_category))
 
 #paste result into a table with 3 columns
 #86 - 172 - 257
-names_no_match <- dfosm_no_match_dprs$osm_name_simple 
-dftable <- data.frame(unmatched_osm_names=names_no_match[1:86],
-                      x2=names_no_match[87:172],
-                      x3=names_no_match[172:257])
+#238 : 80 - 160 - 238
+# names_no_match <- dfosm_no_match_dprs$osm_name_simple 
+# dftable <- data.frame(unmatched_osm_names=names_no_match[1:86],
+#                       x2=names_no_match[87:172],
+#                       x3=names_no_match[172:257])
+
+names_no_match <- dfosm_no_match_dprs_nopharm$osm_name_simple 
+dftable <- data.frame(unmatched_osm_names=names_no_match[1:80],
+                      x2=names_no_match[81:160],
+                      x3=c(names_no_match[161:238],NA,NA)) #note 2 NAs to fill dataframe
 
 knitr::kable(dftable)
 
