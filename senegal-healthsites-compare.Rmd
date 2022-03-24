@@ -339,21 +339,50 @@ names(dfosm) <- names(dfosm) %>%
   #remove _facility_location_ before coords
   str_replace_all("_facility_location_", "") %>% 
   str_replace_all("\\?", "") %>%   
-  str_replace_all("what_is_the_number_of_", "") 
+  str_replace_all("what_is_the_number_of_", "") %>% 
+  str_replace_all("speciality_medical_equipment_available/","") %>% 
+  str_replace_all("available_services/","") %>% 
+  str_replace_all("does_this_facility_provide_","")
 
 #dfosm$in_which_health_zone_is_the_facility_located
 #[1] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA 
 
-dfosm2 <- dfosm %>% select(name_of_facility, 
-                           city, 
+# which columns are most useful ?
+ #  [8] "name_of_facility" 
+# [15] "phone_number" #I think phone of facility, beware also phonenumber
+ # [16] "operator_type" 
+ # [19] "latitude"          
+ # [20] "longitude" 
+# [23] "operational_status"   
+# [46] "opening_hours" #"24/7"
+# [54] "functional_medicalized_ambulances" 
+# [55] "functional_non-medical_ambulances"
+# [63] "functional_ambulance_launches"    
+# [124] "state_midwives"  
+# [210] "available_services"
+# [222] "birthing_center"   
+# [234] "emergency_department"              
+# [235] "emergency_services"  
+# [237] "number_of_beds"                                                    
+# [238] "number_of_doctors"                                                 
+# [239] "number_of_nurses"  
+# [246] "what_is_the_source_of_water_for_this_facility"                   
+# [247] "what_is_the_source_of_power_for_this_facility"    
+
+# create a datframe with selected useful columns to make easier to manage
+dfosm2 <- dfosm %>% select(name_of_facility,
+                           city,
+                           phone_number, 
                            operator_type, 
                            longitude, 
                            latitude, 
                            operational_status,
                            facility_category,
+                           emergency_services,
                            number_of_beds,
                            number_of_doctors,
-                           number_of_nurses)
+                           number_of_nurses,
+                           )
 
 table(dfosm2$facility_category)
 # Clinic  Dentist  Doctors Hospital Pharmacy 
@@ -537,6 +566,77 @@ plot(gg)
 
 ```
 
+### Using the new OSM-survey data to inform a specific user story
+
+User story:
+As a Pregnant women I want to know the availability of a specialist in the event of a complication so that I can plan for my pregnancy.
+
+To identify such specialist facilities we can start to build a data query like this.
+
+amenity = clinic or doctors or hospital    
+or    
+healthcare = doctor or hospital or clinic    
+and    
+beds >= 1    
+emergency = yes    
+contact:phone = phone number    
+
+With the collected survey data we can express this as :    
+facility_category = Clinic or Doctors or Hospital    
+operational_status = operational    
+emergency_services = Yes    
+number_of_beds > 0    
+phone_number = present     
+
+```{r map-osm-pregancy-user, eval=TRUE, fig.height=4, fig.show='hold'}
+
+# create a column to represent whether a facility
+# can support the pregnancy user story
+# initially this query works on the collected data
+# later it could be modified to work on data after it has been uploaded into OSM
+
+sfosm <- sfosm %>% 
+  mutate(emergency_pregnancy =
+           case_when((facility_category %in% c("Clinic","Doctors","Hospital") &
+                     operational_status == "Operational" &
+                     emergency_services %in% c("Yes","OUI") &   
+                     number_of_beds > 0 &
+                     !is.na(phone_number))   ~ "yes",
+                     TRUE ~ "no"
+  ))
+  
+# table(sfosm$emergency_pregnancy)
+#  no yes 
+# 359  35 
+
+kable(table(sfosm$emergency_pregnancy, dnn="Facility likely to support emergency pregnancy"))
+
+#map emergency_pregnancy
+tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
+    tm_borders("grey", lwd = .5) +
+    tm_shape(sfsen_adm0) +
+    tm_borders("black", lwd = .5) +
+  
+  tm_shape(sfosm) +
+  
+  #0square,1circle,2triangle,3+,4x
+  #, shapes=c(3,1) unfortunately using shape & colour gave two legends
+  #shape="emergency_pregnancy"
+  
+    tm_symbols(col="emergency_pregnancy", 
+               palette=c('darkgreen','red'), 
+               size=0.1,
+               border.lwd=NA,
+               alpha=0.8) +
+  
+    tm_layout(main.title='Facilities likely to support emergency pregnancy needs, OSM-Senegal survey 2022', main.title.size=1,
+              legend.bg.color=TRUE, legend.position=c("center","BOTTOM"),
+              title="map by @afrimapr", title.color="darkgrey", title.size=0.8, title.position=c("RIGHT","BOTTOM")) #main.title goes above map
+
+
+```
+
+
 ### Comparison of facility naming between DPRS and the new OSM-Senegal survey
 
 Can we automatically match facility names in the OSM-Senegal survey data with their equivalent names used by DPRS ?
@@ -612,7 +712,7 @@ dfosm2$osm_name_simple <- dfosm2$osm_name_simple %>%
   str_squish() #remove whitespace from either side & repeats in middle
 
 #test how many names match between the two columns to start with
-dfosm_matches_dprs_fullname <- dfosm %>% 
+dfosm_matches_dprs_fullname <- dfosm2 %>% 
   filter(name_of_facility %in% dfdprs$dprs_names)
 #nrow(dfosm_matches_dprs_fullname)
 #0 matches !
