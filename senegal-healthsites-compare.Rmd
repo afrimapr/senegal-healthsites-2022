@@ -675,7 +675,7 @@ kable( st_drop_geometry(select(sfosm_emerg_preg, name_of_facility,
                                 doctors=number_of_doctors,
                                 nurses=number_of_nurses)))
 
-#write_csv(sfosm_emerg_preg, file="//data//emerg-preg-stlouis-osmsurvey.csv")
+write_csv(sfosm_emerg_preg, file="data//emerg-preg-stlouis-osmsurvey.csv")
 
 ```
 
