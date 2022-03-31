@@ -643,6 +643,7 @@ tmap::tm_shape(filter(sfsen_adm1, shapeName=="Saint Louis")) +
 
 # eval FALSE
 # how to make an interactive map for the emergency pregnancy user story
+# make this into a shiny app
 
 mapvosm <- mapview::mapview(sfosm,
                             zcol="emergency_pregnancy",
@@ -650,6 +651,31 @@ mapvosm <- mapview::mapview(sfosm,
                             col.regions = c('lightblue','red'))                            
                             #col.regions = RColorBrewer::brewer.pal(9, "RdGn"))
 
+
+```
+
+```{r table-osm-pregancy-user, eval=TRUE, fig.height=4, fig.show='hold'}
+
+#create a table of the facilities (35) likely to support the pregnancy user story
+sfosm_emerg_preg <- filter(sfosm, emergency_pregnancy=="yes")
+
+#arrange by city
+sfosm_emerg_preg <- arrange(sfosm_emerg_preg, city)
+
+#names(sfosm_emerg_preg)
+ # [1] "name_of_facility"    "city"                "phone_number"        "operator_type"      
+ # [5] "operational_status"  "facility_category"   "emergency_services"  "number_of_beds"     
+ # [9] "number_of_doctors"   "number_of_nurses"    "geometry"            "emergency_pregnancy"
+
+#drop the geometry columns don't want in table
+kable( st_drop_geometry(select(sfosm_emerg_preg, name_of_facility,
+                                city,
+                                operator=operator_type,
+                                beds=number_of_beds,
+                                doctors=number_of_doctors,
+                                nurses=number_of_nurses)))
+
+#write_csv(sfosm_emerg_preg, file="//data//emerg-preg-stlouis-osmsurvey.csv")
 
 ```
 
