@@ -36,14 +36,13 @@ pageWithSidebar(
     #                             "Types.of.insurance.accepted." = "Types.of.insurance.accepted."),
     #              selected = "Number.of.Beds"),
 
-    p("PROTOTYPE under development March 2022\n"),
+    p("PROTOTYPE March 2022, not to be used for decision making"),
 
-    p("Developed by ", a("afrimapr", href="http://www.afrimapr.org", target="_blank"), "Contact : ", a("@southmapr", href="https://twitter.com/southmapr", target="_blank")),
-    p("Open source ", a("R code", href="https://github.com/afrimapr/senegal-healthsites-2022", target="_blank")),
-
-    p("Input and suggestions ", a("welcome", href="https://github.com/afrimapr/suggestions_and_requests", target="_blank")),
-
-    p(tags$small("Disclaimer : Data used by afrimapr are sourced from published open data sets. We provide no guarantee of accuracy.")),
+    p("Developed by ", a("afrimapr", href="http://www.afrimapr.org", target="_blank"),
+      "Open source ", a("R code", href="https://github.com/afrimapr/senegal-healthsites-2022", target="_blank")),
+ 
+    #p("Input and suggestions ", a("welcome", href="https://github.com/afrimapr/suggestions_and_requests", target="_blank")),
+    #p(tags$small("Disclaimer : Data used by afrimapr are sourced from published open data sets. We provide no guarantee of accuracy.")),
 
   ),
   mainPanel(

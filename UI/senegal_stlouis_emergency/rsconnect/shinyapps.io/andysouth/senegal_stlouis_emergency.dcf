@@ -1,0 +1,12 @@
+name: senegal_stlouis_emergency
+title: senegal_stlouis_emergency
+username:
+account: andysouth
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5934090
+bundleId: 5726436
+url: https://andysouth.shinyapps.io/senegal_stlouis_emergency/
+when: 1648213548.8324
+asMultiple: FALSE
+asStatic: FALSE

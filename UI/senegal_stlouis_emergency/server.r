@@ -25,7 +25,7 @@ library(sf)
 # sfsen <- sf::st_as_sf(dfsen, coords=c("Facility.Location...longitude", "Facility.Location...latitude"), crs = 4326, na.fail = FALSE)
 
 
-readRDS("sfosm.RDS")
+sfosm <- readRDS("sfosm.RDS")
 
 
 # Define a server for the Shiny app
@@ -48,6 +48,7 @@ function(input, output) {
     mapplot <- mapview::mapview(sfosm,
                                 zcol="emergency_pregnancy",
                                 label=paste("osm:",sfosm[["name_of_facility"]]),
+                                map.types=c('OpenStreetMap','CartoDB.Positron','OpenStreetMap.HOT'),
                                 col.regions = c('lightblue','red')) 
         
     #important that this returns the @map bit
