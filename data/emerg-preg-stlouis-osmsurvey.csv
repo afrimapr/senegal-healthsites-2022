@@ -1,36 +1,36 @@
-name_of_facility,city,phone_number,operator_type,operational_status,facility_category,emergency_services,number_of_beds,number_of_doctors,number_of_nurses,geometry,emergency_pregnancy
-Case de santé de Abdallah,Abdallah/Pété,772780608,Community,Operational,Doctors,Yes,3,0,1,"c(-13.9746936, 16.2361409)",yes
-Cabinet de santé Seydina Mouhamed (PSL) de la Vallée du Fleuve,Aéré Lao/Pété,776597564,Private,Operational,Clinic,Yes,5,0,1,"c(-14.3259875, 16.3959786)",yes
-Case de santé Aéré poste,Aéré poste/  bodé,762344896,Public,Operational,Doctors,OUI,1,NA,1,"c(-14.3276143, 16.4518063)",yes
-Posté de santé Alwar,Alwar / ndioum,773233681,Public,Operational,Doctors,OUI,2,NA,1,"c(-14.6558606, 16.5858653)",yes
-Case de santé Athie baly,Athie baly/Dodel,774589292,Public,Operational,Doctors,OUI,4,NA,1,"c(-14.592656, 16.2327497)",yes
-Poste de santé de Borobé,Barobé/Pété,775737267,Public,Operational,Doctors,Yes,4,0,1,"c(-13.8956036, 16.1837104)",yes
-Poste de santé de Bouteyni,Bouteyni,774532518,Public,Operational,Doctors,Yes,8,0,1,"c(-15.4992593, 15.9688858)",yes
-Posté de santé Cas Cas,Cas cas/ pété,773164267,Public,Operational,Doctors,OUI,5,NA,2,"c(-14.0593588, 16.3870664)",yes
-Case de santé cogga diéry,Cogga diéry/ bodélawo,776637012,Public,Operational,Doctors,OUI,2,NA,1,"c(-14.4246138, 16.4357614)",yes
-Poste de santé de Dara Halaybe,Dara Halaybe/podor,779111462,Public,Operational,Doctors,Yes,4,0,1,"c(-14.4071648, 16.6233506)",yes
-Poste de santé Diagnoum,Diagnoum/Podor,775742563,Public,Operational,Doctors,Yes,11,NA,2,"c(-15.1462488, 16.5172979)",yes
-Poste de santé Dioudé diabé,Dioudé diabé / pété,779868048,Public,Operational,Doctors,OUI,12,NA,1,"c(-13.984354, 16.3280609)",yes
-Poste de santé de Dounguel,Dounguel/pété,774291617,Public,Operational,Doctors,OUI,3,NA,1,"c(-14.0290865, 16.3440534)",yes
-Poste de santé de Gamadji Saré,Gamadji Saré/Podor,775088112,Public,Operational,Doctors,Yes,13,0,1,"c(-14.696871, 16.5196651)",yes
-Posté de santé de Pathé galo,Pathé galo/ podor,783561383,Public,Operational,Doctors,OUI,2,NA,1,"c(-14.4543318, 16.6204109)",yes
-Poste de santé Gallo Malick,Richard Toll,775419374,Public,Operational,Doctors,Yes,6,0,2,"c(-15.6734207, 16.4637772)",yes
-Poste de santé Thiabax,Richard Toll,774081817,Public,Operational,Doctors,Yes,5,NA,1,"c(-15.6850717, 16.4534463)",yes
-Poste de santé taouey,Richard Toll,775612201,Public,Operational,Doctors,Yes,8,NA,2,"c(-15.6967442, 16.4590808)",yes
-Service médical CSS Richard Toll,Richard Toll,339382323,Private,Operational,Doctors,Yes,3,5,15,"c(-15.7082403, 16.4673658)",yes
-Cabinet médical Thierno souleymani Baal,Richard Toll,775879019,Private,Operational,Doctors,Yes,2,1,0,"c(-15.6751612, 16.4630993)",yes
-Centre de santé de Ross béthio,Ross béthio,772279775,Public,Operational,Doctors,Yes,19,1,0,"c(-16.1372909, 16.2728389)",yes
-Centre de Santé Richard Toll,Saint louis,772178595,Public,Operational,Doctors,Yes,23,10,4,"c(-15.6761783, 16.4602179)",yes
-Clinique El hadji Adama Wade,Saint Louis,339618866,Private,Operational,Clinic,Yes,8,4,3,"c(-16.4914231, 16.0310667)",yes
-Hôpital régional de Saint-Louis,Saint Louis,770993430,Public,Operational,Hospital,Yes,132,108,44,"c(-16.5059322, 16.0234441)",yes
-Ministère de la santé,Saint Louis,709135150,Public,Operational,Doctors,Yes,1,NA,1,"c(-16.4897728, 15.9849741)",yes
-Suma urgences,Saint Louis,339610204,Private,Operational,Clinic,Yes,4,1,1,"c(-16.4993669, 16.0188567)",yes
-Poste de santé de Saldé,Saldé/Pété,773630169,Public,Operational,Doctors,Yes,6,0,1,"c(-13.8816571, 16.1644449)",yes
-Case de santé sambawté,Sambawté/ pété,772438665,Public,Operational,Doctors,OUI,10,NA,1,"c(-13.8552912, 16.1146544)",yes
-Poste de santé de Siwré,Siwré/Pété,773556126,Public,Operational,Doctors,Yes,7,0,1,"c(-14.1432831, 16.4541623)",yes
-Case de santé de tchila,Tchila/pété,782080713,Public,Operational,Doctors,OUI,6,NA,2,"c(-14.1071584, 16.4207833)",yes
-Poste de santé de Thiangaye,Thiangaye/Podor,773076106,Public,Operational,Doctors,Yes,12,0,1,"c(-15.1711754, 16.5263499)",yes
-Posté de santé de Thioubolel,Thioubolel/ pété,774252715,Public,Operational,Doctors,OUI,7,NA,1,"c(-13.9887258, 16.2711321)",yes
-Posté de santé de Walaldé,Walaldé/ pété,775250285,Public,Operational,Doctors,OUI,11,NA,1,"c(-14.2122675, 16.5053295)",yes
-Centre de santé Thielé Boubacar,NA,772713441,Public,Operational,Doctors,Yes,12,1,1,"c(-15.090852, 16.5189966)",yes
-Case Mboubi NDiyam,NA,779878303,Public,Operational,Doctors,OUI,2,NA,2,"c(-14.5813827, 16.3869223)",yes
+name_of_facility,city,phone_number,operator_type,longitude,latitude,operational_status,facility_category,emergency_services,number_of_beds,number_of_doctors,number_of_nurses,osm_name_simple,emergency_pregnancy
+Case de santé de Abdallah,Abdallah/Pété,772780608,Community,-13.9746936,16.2361409,Operational,Doctors,Yes,3,0,1,case sante abdallah,yes
+Cabinet de santé Seydina Mouhamed (PSL) de la Vallée du Fleuve,Aéré Lao/Pété,776597564,Private,-14.3259875,16.3959786,Operational,Clinic,Yes,5,0,1,cabinet sante seydina mouhamed (psl) la vallee du fleuve,yes
+Case de santé Aéré poste,Aéré poste/  bodé,762344896,Public,-14.3276143,16.4518063,Operational,Doctors,OUI,1,NA,1,case sante aere poste,yes
+Posté de santé Alwar,Alwar / ndioum,773233681,Public,-14.6558606,16.5858653,Operational,Doctors,OUI,2,NA,1,poste sante alwar,yes
+Case de santé Athie baly,Athie baly/Dodel,774589292,Public,-14.592656,16.2327497,Operational,Doctors,OUI,4,NA,1,case sante athie baly,yes
+Poste de santé de Borobé,Barobé/Pété,775737267,Public,-13.8956036,16.1837104,Operational,Doctors,Yes,4,0,1,poste sante borobe,yes
+Poste de santé de Bouteyni,Bouteyni,774532518,Public,-15.4992593,15.9688858,Operational,Doctors,Yes,8,0,1,poste sante bouteyni,yes
+Posté de santé Cas Cas,Cas cas/ pété,773164267,Public,-14.0593588,16.3870664,Operational,Doctors,OUI,5,NA,2,poste sante cas cas,yes
+Case de santé cogga diéry,Cogga diéry/ bodélawo,776637012,Public,-14.4246138,16.4357614,Operational,Doctors,OUI,2,NA,1,case sante cogga diery,yes
+Poste de santé de Dara Halaybe,Dara Halaybe/podor,779111462,Public,-14.4071648,16.6233506,Operational,Doctors,Yes,4,0,1,poste sante dara halaybe,yes
+Poste de santé Diagnoum,Diagnoum/Podor,775742563,Public,-15.1462488,16.5172979,Operational,Doctors,Yes,11,NA,2,poste sante diagnoum,yes
+Poste de santé Dioudé diabé,Dioudé diabé / pété,779868048,Public,-13.984354,16.3280609,Operational,Doctors,OUI,12,NA,1,poste sante diou diabe,yes
+Poste de santé de Dounguel,Dounguel/pété,774291617,Public,-14.0290865,16.3440534,Operational,Doctors,OUI,3,NA,1,poste sante dounguel,yes
+Poste de santé de Gamadji Saré,Gamadji Saré/Podor,775088112,Public,-14.696871,16.5196651,Operational,Doctors,Yes,13,0,1,poste sante gamadji sare,yes
+Posté de santé de Pathé galo,Pathé galo/ podor,783561383,Public,-14.4543318,16.6204109,Operational,Doctors,OUI,2,NA,1,poste sante pathe galo,yes
+Poste de santé Gallo Malick,Richard Toll,775419374,Public,-15.6734207,16.4637772,Operational,Doctors,Yes,6,0,2,poste sante gallo malick,yes
+Poste de santé Thiabax,Richard Toll,774081817,Public,-15.6850717,16.4534463,Operational,Doctors,Yes,5,NA,1,poste sante thiabax,yes
+Poste de santé taouey,Richard Toll,775612201,Public,-15.6967442,16.4590808,Operational,Doctors,Yes,8,NA,2,poste sante taouey,yes
+Service médical CSS Richard Toll,Richard Toll,339382323,Private,-15.7082403,16.4673658,Operational,Doctors,Yes,3,5,15,service medical css richard toll,yes
+Cabinet médical Thierno souleymani Baal,Richard Toll,775879019,Private,-15.6751612,16.4630993,Operational,Doctors,Yes,2,1,0,cabinet medical thierno souleymani baal,yes
+Centre de santé de Ross béthio,Ross béthio,772279775,Public,-16.1372909,16.2728389,Operational,Doctors,Yes,19,1,0,centre sante ross bethio,yes
+Centre de Santé Richard Toll,Saint louis,772178595,Public,-15.6761783,16.4602179,Operational,Doctors,Yes,23,10,4,centre sante richard toll,yes
+Clinique El hadji Adama Wade,Saint Louis,339618866,Private,-16.4914231,16.0310667,Operational,Clinic,Yes,8,4,3,clinique el hadji adama wa,yes
+Hôpital régional de Saint-Louis,Saint Louis,770993430,Public,-16.5059322,16.0234441,Operational,Hospital,Yes,132,108,44,hopital regional saint-louis,yes
+Ministère de la santé,Saint Louis,709135150,Public,-16.4897728,15.9849741,Operational,Doctors,Yes,1,NA,1,ministere la sante,yes
+Suma urgences,Saint Louis,339610204,Private,-16.4993669,16.0188567,Operational,Clinic,Yes,4,1,1,suma urgences,yes
+Poste de santé de Saldé,Saldé/Pété,773630169,Public,-13.8816571,16.1644449,Operational,Doctors,Yes,6,0,1,poste sante sal,yes
+Case de santé sambawté,Sambawté/ pété,772438665,Public,-13.8552912,16.1146544,Operational,Doctors,OUI,10,NA,1,case sante sambawte,yes
+Poste de santé de Siwré,Siwré/Pété,773556126,Public,-14.1432831,16.4541623,Operational,Doctors,Yes,7,0,1,poste sante siwre,yes
+Case de santé de tchila,Tchila/pété,782080713,Public,-14.1071584,16.4207833,Operational,Doctors,OUI,6,NA,2,case sante tchila,yes
+Poste de santé de Thiangaye,Thiangaye/Podor,773076106,Public,-15.1711754,16.5263499,Operational,Doctors,Yes,12,0,1,poste sante thiangaye,yes
+Posté de santé de Thioubolel,Thioubolel/ pété,774252715,Public,-13.9887258,16.2711321,Operational,Doctors,OUI,7,NA,1,poste sante thioubolel,yes
+Posté de santé de Walaldé,Walaldé/ pété,775250285,Public,-14.2122675,16.5053295,Operational,Doctors,OUI,11,NA,1,poste sante walal,yes
+Centre de santé Thielé Boubacar,NA,772713441,Public,-15.090852,16.5189966,Operational,Doctors,Yes,12,1,1,centre sante thiele boubacar,yes
+Case Mboubi NDiyam,NA,779878303,Public,-14.5813827,16.3869223,Operational,Doctors,OUI,2,NA,2,case mboubi ndiyam,yes

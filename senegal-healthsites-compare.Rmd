@@ -595,7 +595,8 @@ phone_number = present
 # initially this query works on the collected data
 # later it could be modified to work on data after it has been uploaded into OSM
 
-sfosm <- sfosm %>% 
+#sfosm <- sfosm %>% 
+dfosm2 <- dfosm2 %>%   
   mutate(emergency_pregnancy =
            case_when((facility_category %in% c("Clinic","Doctors","Hospital") &
                      operational_status == "Operational" &
@@ -605,11 +606,16 @@ sfosm <- sfosm %>%
                      TRUE ~ "no"
   ))
   
-# table(sfosm$emergency_pregnancy)
+# table(dfosm2$emergency_pregnancy)
 #  no yes 
 # 359  35 
 
-kable(table(sfosm$emergency_pregnancy, dnn="Facility likely to support emergency pregnancy"))
+kable(table(dfosm2$emergency_pregnancy, dnn="Facility likely to support emergency pregnancy"))
+
+#convert to sf again
+sfosm <- st_as_sf(dfosm2, 
+                  coords=c("longitude", "latitude"), 
+                  crs=4326)
 
 #can I order rows to make sure emergency facilities paint on top ?
 sfosm <- arrange(sfosm, emergency_pregnancy)
@@ -657,25 +663,29 @@ mapvosm <- mapview::mapview(sfosm,
 ```{r table-osm-pregancy-user, eval=TRUE, fig.height=4, fig.show='hold'}
 
 #create a table of the facilities (35) likely to support the pregnancy user story
-sfosm_emerg_preg <- filter(sfosm, emergency_pregnancy=="yes")
+#sfosm_emerg_preg <- filter(sfosm, emergency_pregnancy=="yes")
+#do on df not sf to get separate coords in output
+dfosm_emerg_preg <- filter(dfosm2, emergency_pregnancy=="yes")
 
 #arrange by city
-sfosm_emerg_preg <- arrange(sfosm_emerg_preg, city)
+dfosm_emerg_preg <- arrange(dfosm_emerg_preg, city)
 
-#names(sfosm_emerg_preg)
- # [1] "name_of_facility"    "city"                "phone_number"        "operator_type"      
- # [5] "operational_status"  "facility_category"   "emergency_services"  "number_of_beds"     
- # [9] "number_of_doctors"   "number_of_nurses"    "geometry"            "emergency_pregnancy"
+#names(dfosm_emerg_preg)
+#  [1] "name_of_facility"    "city"                "phone_number"        "operator_type"      
+#  [5] "longitude"           "latitude"            "operational_status"  "facility_category"  
+#  [9] "emergency_services"  "number_of_beds"      "number_of_doctors"   "number_of_nurses"   
+# [13] "osm_name_simple"     "emergency_pregnancy"
 
 #drop the geometry columns don't want in table
-kable( st_drop_geometry(select(sfosm_emerg_preg, name_of_facility,
+#kable( st_drop_geometry(select(sfosm_emerg_preg, name_of_facility,
+kable( select(dfosm_emerg_preg, name_of_facility,                               
                                 city,
                                 operator=operator_type,
                                 beds=number_of_beds,
                                 doctors=number_of_doctors,
-                                nurses=number_of_nurses)))
+                                nurses=number_of_nurses))
 
-write_csv(sfosm_emerg_preg, file="data//emerg-preg-stlouis-osmsurvey.csv")
+write_csv(dfosm_emerg_preg, file="data//emerg-preg-stlouis-osmsurvey.csv")
 
 ```
 
